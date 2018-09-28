@@ -1,0 +1,32 @@
+<div class={{concat "ui inverted dimmer" (if _loading " active" "")}}>
+  <div class="ui text loader">
+    <button class="ui button" {{action "abortRequest"}}>Отменить загрузку</button>
+  </div>
+</div>
+<div class="report-viewer">
+  <div id="toolbar">
+    <button id="build-report" class="ui create-button button" {{action "buildReport"}}>Сформировать</button>
+    <div id="export-report">
+      <button class="ui button icon export-button" title="Выгрузка в pdf" {{action 'exportReport' 'pdf'}}>
+        <i class="large file pdf outline icon"></i>
+      </button> 
+      <button class="ui button icon export-button" title="Выгрузка в xlsx" {{action 'exportReport' 'xlsx'}}>
+        <i class="large file excel outline icon"></i>
+      </button>
+      <button class="ui button icon export-button" title="Выгрузка в csv" {{action 'exportReport' 'csv'}}>
+        <i class="large file archive outline icon"></i>
+      </button>
+    </div>
+
+    <button id="print-report" class="ui button" {{action 'printReport'}}>Печать</button>
+
+    <div id="pagging">
+      <button class="ui button prev-page-button disabled" {{action 'getPrevPage'}}></button>
+      {{reportCurrentPage}} из {{reportPagesCount}}
+      <button class="ui button next-page-button disabled" {{action 'getNextPage'}}></button>
+    </div>
+  </div>
+  <div id="content-block">
+    <iframe id="content" scrolling="no"></iframe>
+  </div>
+</div>

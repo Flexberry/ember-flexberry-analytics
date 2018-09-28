@@ -1,0 +1,1 @@
+export { default } from 'ember-flexberry-analytics/components/report-viewer';

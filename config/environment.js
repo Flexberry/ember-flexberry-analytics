@@ -3,10 +3,6 @@
 
 module.exports = function(environment) {
   var ENV = {
-        APP: {
-          reportUrl:'repurl'
-    },
-
     report:{
       reportWebApi: 'http://localhost:3564',
       extention :'.prpt'

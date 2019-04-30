@@ -12,7 +12,6 @@ const {
   export default Service.extend({
     __config__: computed(function() {
       return Ember.getOwner(this)._lookupFactory('config:environment');
-      //return Ember.getOwner(this).resolveRegistration('config:environment');
     }),
   
     unknownProperty(path) {

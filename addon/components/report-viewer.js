@@ -1,10 +1,8 @@
 import Ember from 'ember';
 import moment from 'moment';
 import layout from '../templates/components/report-viewer';
-import ReportParameter from '../utils/report-parameter';
 
 export default Ember.Component.extend({
-  //notifications: Ember.inject.service('notification-messages-service'),
   notifications: Ember.inject.service('notification-messages'),
   config: Ember.inject.service(),
 
@@ -45,12 +43,12 @@ export default Ember.Component.extend({
   init() {
     this._super();
     let config = this.get('config');
- 
+    this.set('_reportAPIEndpoint', config.get('report.reportWebApi') + '/api/Report/');
   },
 
   getReport(path, parameters, onDone, onFail) {
     Object.assign(parameters, { reportPath: path });
-    return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}getReport/`, parameters, '', onDone, onFail);
+    return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}getReport/`, parameters, 'json', onDone, onFail);
   },
 
   getReportPagesCount(path, parameters, onDone, onFail) {
@@ -60,7 +58,7 @@ export default Ember.Component.extend({
 
   getExportReportData(path, parameters, onDone, onFail) {
     Object.assign(parameters, { reportPath: path });
-    return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}export/`, parameters, 'arraybuffer', onDone, onFail);
+    return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}export/`, parameters, 'blob', onDone, onFail);
   },
 
   /**
@@ -93,31 +91,36 @@ export default Ember.Component.extend({
    * @param {Function} onDone Функция обратного вызова на случай успеха.
    * @param {Function} onFail Функция обратного вызова на случай ошибки.
    */
-  _sendPostRequest(uri, parameters, dataType, onDone, onFail) {
+  _sendPostRequest(uri, parameters, dataType, onSuccess, onError) {
     let _this = this;
 
-    onDone = onDone || function(data) { return data; };
+    onSuccess = onSuccess || function (data) { return data; };
 
-    onFail = onFail || function(e) {
-      _this.set('_loading', false);
+    onError = onError || function (e) {
+      _this._loading = false;
       if (e.statusText !== 'abort') {
-        Ember.Logger.error(e);
-        // _this.get('notifications').error('Ошибка построения отчёта. Обратитесь к администратору', {
-        //   autoClear: true,
-        //   clearDuration: 7000
-        // });
+        console.log(e);
       }
     };
 
-    return Ember.$.ajax({
-      method: 'POST',
-      url: uri,
-      data: JSON.stringify(parameters),
-      dataType: dataType,
-      contentType: 'application/json; charset=utf-8',
-    }).done(data => onDone(data))
-      .fail(e => onFail(e));
-  },
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', uri, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.responseType = dataType;
+    xhr.withCredentials = true;
+
+    xhr.onload = function () {
+      if (this.status === 200) {
+        onSuccess(this.response);
+      }
+    };
+
+    xhr.onerror = function (e) {
+      onError(e);
+    };
+
+    xhr.send(JSON.stringify(parameters)); 
+  }, 
 
   /**
    *  Загружает файл на компьютер.
@@ -224,10 +227,10 @@ export default Ember.Component.extend({
         this.set('_loading', false);
         Ember.Logger.log('Ошибка построения отчёта.', e);
 
-        // this.get('notifications').error('Ошибка построения отчёта. Обратитесь к администратору', {
-        //   autoClear: true,
-        //   clearDuration: 7000
-        // });
+        this.get('notifications').error('Ошибка построения отчёта. Обратитесь к администратору', {
+          autoClear: true,
+          clearDuration: 7000
+        });
       }
     },
 
@@ -283,10 +286,10 @@ export default Ember.Component.extend({
         this.set('_loading', false);
         Ember.Logger.log('Ошибка при экспорте отчёта.', e);
 
-        // this.get('notifications').error('Ошибка при экспорте отчёта. Обратитесь к администратору', {
-        //   autoClear: true,
-        //   clearDuration: 7000
-        // });
+        this.get('notifications').error('Ошибка при экспорте отчёта. Обратитесь к администратору', {
+          autoClear: true,
+          clearDuration: 7000
+        });
       }
     },
 
@@ -312,10 +315,10 @@ export default Ember.Component.extend({
         this.set('_loading', false);
         Ember.Logger.log('Ошибка при печати отчёта.', e);
 
-        // this.get('notifications').error('Ошибка при печати отчёта. Обратитесь к администратору', {
-        //   autoClear: true,
-        //   clearDuration: 7000
-        // });
+        this.get('notifications').error('Ошибка при печати отчёта. Обратитесь к администратору', {
+          autoClear: true,
+          clearDuration: 7000
+        });
       }
     },
 
@@ -373,11 +376,11 @@ export default Ember.Component.extend({
       this._abortRunningXHRs();
       this.set('_loading', false);
 
-      // this.get('notifications').info('Формирование отчёта отменено', {
-      //   autoClear: true,
-      //   clearDuration: 7000,
-      //   cssClasses: 'ember-cli-notification-info'
-      // });
+      this.get('notifications').info('Формирование отчёта отменено', {
+        autoClear: true,
+        clearDuration: 7000,
+        cssClasses: 'ember-cli-notification-info'
+      });
     }
   }
 });

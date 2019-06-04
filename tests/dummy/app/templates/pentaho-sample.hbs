@@ -1,0 +1,59 @@
+<h2 id="title">{{reportName}}</h2>
+<div class="ui container">
+    <label>{{reportParameters.Birthday.paramLabel}}</label>
+    {{input type="date" name="birthdate" value=reportParameters.Birthday.value }}
+</div>
+
+<div class="ui container">
+  <label>{{reportParameters.city.paramLabel}}</label>
+  {{#ui-dropdown class="selection" onChange=(action 'selectCity')  selected=selectedCity}}
+    <div class="default text">Не указан</div>
+    <i class="dropdown icon"></i>
+    <div class="menu">
+        <div class="item" data-value=0>Не указан</div>
+        <div class="item" data-value=614000>Пермь</div>
+        <div class="item" data-value=620000>Екатеринбург</div>
+        <div class="item"  data-value=644000>Омск</div>
+        <div class="item" data-value=101000>Москва</div>
+    </div>
+  {{/ui-dropdown}}
+  
+</div>
+
+<div class="ui container">
+  <div class="grouped inline fields">
+      <label>{{reportParameters.gender.paramLabel}}</label>
+      <div class="field">
+        {{ui-radio name="genderbut" label="Мужской" checked='checked' value=0 current=genderresult onChange=(action "selectGender")}}
+      </div>
+      <div class="field">
+        {{ui-radio name="genderbut" label="Женский"  value=1 current=genderresult onChange=(action "selectGender")}}
+      </div>
+    </div>
+</div>
+    
+<div class="ui container">
+  <label>{{reportParameters.textlogin.paramLabel}}</label>
+  <div class="field">
+    {{textarea value=reportParameters.textlogin.value cols="20" rows="1"}}
+  </div>
+</div>
+
+<div class="ui container">
+    <label>{{reportParameters.documentlist.paramLabel}}</label>
+    {{#each doclist as |name|}}
+    <div class="field">
+      <div class="ui checkbox">
+        <input type="checkbox" value={{name}} name="documentitem" onclick={{action "selectdocs"}}>
+        <label>{{name}}</label>
+      </div>
+    </div>
+    {{/each}}
+</div>
+
+{{
+  report-viewer
+  reportName=reportName
+  reportParameters=reportParameters
+  reportPath=reportPath
+}}

@@ -7,6 +7,7 @@ export default Ember.Controller.extend({
     reportParameters: {},
     reportPath: ':public:Other Project:PentahoSample.prpt',
     doclist : ['Паспорт РФ','Загранпаспорт','Снилс','Водительское удостоверение','Военный билет'],
+    
     init(){
         this.initReportParameters();
         this.initStartValue();
@@ -31,7 +32,7 @@ export default Ember.Controller.extend({
         },
 
     initStartValue(){
-      var currentdate = new Date().toISOString().slice(0, 10);
+      const currentdate = new Date().toISOString().slice(0, 10);
       this.set('reportParameters.Birthday.value',currentdate);
       this.set('reportParameters.textlogin.value','Tony Stark');
       this.set('reportParameters.gender.value',0);
@@ -46,13 +47,14 @@ export default Ember.Controller.extend({
           this.set('reportParameters.city.value',this.get('selectedCity'));
         },
         selectdocs(){
-          var favorite = [];
+          const favorite = [];
           $.each($("input[name='documentitem']:checked"), function(){            
             favorite.push($(this).val());
             });
             /// для передачи нескольких значений в 1 параметр, необходимо дублировать навзание параметра для каждого значения.
             //Пример ...?multi-select=Value1&multi-select=Value2
-          var res = favorite.join("&parMultiSelect=");
+          const res =favorite.join("&parMultiSelect=");
+          
           this.set('reportParameters.documentlist.value',res);
         }
     }

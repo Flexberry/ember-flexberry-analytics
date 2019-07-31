@@ -4,7 +4,7 @@
   </div>
 </div>
 <div class="report-viewer">
-  <div id="toolbar">
+  <div class="toolbar">
     <button id="build-report" class="ui create-button button" {{action "buildReport"}}>Сформировать</button>
     <div id="export-report">
       <button class="ui button icon export-button" title="Выгрузка в pdf" {{action 'exportReport' 'pdf'}}>
@@ -21,12 +21,16 @@
     <button id="print-report" class="ui button" {{action 'printReport'}}>Печать</button>
 
     <div id="pagging">
-      <button class="ui button prev-page-button disabled" {{action 'getPrevPage'}}></button>
+      <button class="ui button prev-page-button {{if isPrevButtonDisabled "disabled"}}" {{action 'getPrevPage'}}>
+        <i class="chevron left icon "></i>
+      </button>
       {{reportCurrentPage}} из {{reportPagesCount}}
-      <button class="ui button next-page-button disabled" {{action 'getNextPage'}}></button>
+      <button class="ui button next-page-button {{if isNextButtonDisabled "disabled"}}" {{action 'getNextPage'}}>
+        <i class="chevron right icon "></i>
+      </button>
     </div>
   </div>
   <div id="content-block">
-    <iframe id="content" scrolling="no"></iframe>
+    <iframe id="content" scrolling="no" width={{frameWidth}} height={{frameHeight}}></iframe>
   </div>
 </div>

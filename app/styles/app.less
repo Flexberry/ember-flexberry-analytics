@@ -1,32 +1,5 @@
 @import "multiple-control";
 
-//сегмент параметров
-.beneficiary-report {
-  padding-top: 20px !important;
-
-  > .row:last-child {
-    > div:first-child {
-      max-width: 230px;
-    }
-
-    > div .seven.wide.column {
-      width: 230px !important;
-    }
-
-    > div .column.center.aligned {
-      width: 40px;
-    }
-  }
-
-  .ui.bordered > .wide {
-    padding: 10px
-  }
-
-  .ten.wide.column > .field {
-    width: 718px !important;
-  }
-}
-
 //репорт сегмент
 .report-segment {
   margin-bottom: 2em !important;
@@ -39,7 +12,7 @@
 .report-viewer {
   width: 100%;
 
-  #toolbar {
+  .toolbar {
     height: 55px;
     border-bottom: 0;
 
@@ -73,18 +46,6 @@
     }
   }
 
-  .next-page-button:before {
-    content: "\e81b";
-    font-family: 'Crimean';
-    font-size: 14px;
-    opacity: 1;
-  }
-  .prev-page-button:before {
-    content: "\e81a";
-    font-family: 'Crimean';
-    font-size: 14px;
-    opacity: 1;
-  }
   .export-button, .next-page-button, .prev-page-button {
     border: none;
     color: #7ba7d9 !important;

@@ -22,28 +22,34 @@ export default Ember.Component.extend({
    */
   _runningXHRs: undefined,
 
-  reportName: '',
-  reportParameters: {},
+  reportName: undefined,
+  reportParameters: undefined,
 
   reportCurrentPage: 0,
   reportPagesCount: 0,
-  
+
+  isNextButtonDisabled: true,
+  isPrevButtonDisabled: true,
   // Путь к отчету в pentaho
   reportPath: undefined,
   
+  pentahoReportFormats:undefined,
 
-  pentahoReportFormats: {
-    pageableHtml: 'table/html;page-mode=page',
-    fullHtml: 'table/html;page-mode=stream',
-    pdf: 'pageable/pdf',
-    csv: 'table/csv;page-mode=stream',
-    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow',
-  },
+  frameWidth:undefined,
+  frameHeight:undefined,
 
   init() {
     this._super();
-    let config = this.get('config');
+    const config = this.get('config');
     this.set('_reportAPIEndpoint', config.get('report.reportWebApi') + '/api/Report/');
+    this.set('pentahoReportFormats',{
+      pageableHtml: 'table/html;page-mode=page',
+      fullHtml: 'table/html;page-mode=stream',
+      pdf: 'pageable/pdf',
+      csv: 'table/csv;page-mode=stream',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow',
+    });
+    
   },
 
   getReport(path, parameters, onDone, onFail) {
@@ -67,7 +73,7 @@ export default Ember.Component.extend({
   */
   reportPagesCountObservation: Ember.observer('reportPagesCount', function() {
     if (this.get('reportCurrentPage') !== this.get('reportPagesCount')) {
-      Ember.$('.report-viewer').find('.next-page-button').removeClass('disabled');
+     this.set('isNextButtonDisabled', false);
     }
   }),
 
@@ -76,11 +82,11 @@ export default Ember.Component.extend({
    * @param {String} reportHtml html-разметка отчёта.
    */
   showReport(reportHtml) {
-    let $contentIframe = Ember.$('#content');
+    const $contentIframe = this.$('#content');
 
     $contentIframe.contents().find('body').html(reportHtml);
-    $contentIframe.height(`${$contentIframe.contents().find('body').prop('scrollHeight')}px`);
-    $contentIframe.width(`${$contentIframe.contents().find('body').prop('scrollWidth')}px`);
+    this.set("frameHeight",`${$contentIframe.contents().find('body').prop('scrollHeight')}px`);
+    this.set("frameWidth",`${$contentIframe.contents().find('body').prop('scrollWidth')}px`);
   },
 
   /**
@@ -92,7 +98,7 @@ export default Ember.Component.extend({
    * @param {Function} onFail Функция обратного вызова на случай ошибки.
    */
   _sendPostRequest(uri, parameters, dataType, onSuccess, onError) {
-    let _this = this;
+    const _this = this;
 
     onSuccess = onSuccess || function (data) { return data; };
 
@@ -103,7 +109,7 @@ export default Ember.Component.extend({
       }
     };
 
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.open('POST', uri, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.responseType = dataType;
@@ -130,7 +136,7 @@ export default Ember.Component.extend({
    */
   _downloadFile(fileContent, fileName, fileType) {
     // (см. https://stackoverflow.com/a/23797348)
-    let blob = typeof File === 'function' ?
+    const blob = typeof File === 'function' ?
       new File([fileContent], fileName, { type: fileType })
       : new Blob([fileContent], { type: fileType, lastModified: Date.now });
 
@@ -138,12 +144,12 @@ export default Ember.Component.extend({
       // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
       window.navigator.msSaveBlob(blob, fileName);
     } else {
-      var URL = window.URL || window.webkitURL;
-      var downloadUrl = URL.createObjectURL(blob);
+      const URL = window.URL || window.webkitURL;
+      const downloadUrl = URL.createObjectURL(blob);
 
       if (fileName) {
         // use HTML5 a[download] attribute to specify filename
-        var a = document.createElement('a');
+        const a = document.createElement('a');
 
         // safari doesn't support this yet
         if (typeof a.download === 'undefined') {
@@ -193,7 +199,7 @@ export default Ember.Component.extend({
    * Отменить выполняемые запросы.
    */
   _abortRunningXHRs() {
-    let runningXHRs = this.get('_runningXHRs') || [];
+    const runningXHRs = this.get('_runningXHRs') || [];
     if (runningXHRs.length) {
       let xhr = runningXHRs.pop();
       while (xhr) {
@@ -217,7 +223,7 @@ export default Ember.Component.extend({
         }));
 
         runningXHRs.push(this.getReportPagesCount(this.get('reportPath'), this._getNormalizedParameters(this.get('reportParameters')), data => {
-          this.set('reportPagesCount', data);
+          this.set('reportPagesCount', parseInt(data));
         }));
 
         this.set('reportCurrentPage', 1);
@@ -261,10 +267,10 @@ export default Ember.Component.extend({
 
         this.set('_loading', true);
 
-        let runningXHRs = this.get('_runningXHRs') || [];
+        const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
-        let parameters = Object.assign(
+        const parameters = Object.assign(
           {},
           this._getNormalizedParameters(this.get('reportParameters')),
           {
@@ -297,13 +303,13 @@ export default Ember.Component.extend({
       try {
         this.set('_loading', true);
 
-        let runningXHRs = this.get('_runningXHRs') || [];
+        const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
         runningXHRs.push(this.getReport(this.get('reportPath'), this._getNormalizedParameters(this.get('reportParameters')), reportData => {
           this.set('_loading', false);
 
-          let printWindow = window.open('', 'PRINT', 'height=400,width=600');
+          const printWindow = window.open('', 'PRINT', 'height=400,width=600');
           printWindow.document.write(reportData);
           printWindow.print();
           printWindow.close();
@@ -325,10 +331,10 @@ export default Ember.Component.extend({
     getNextPage() {
       if (this.get('reportCurrentPage') + 1 <= this.get('reportPagesCount')) {
 
-        let runningXHRs = this.get('_runningXHRs') || [];
+        const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
-        let parameters = Object.assign(
+        const parameters = Object.assign(
           {},
           this._getNormalizedParameters(this.get('reportParameters')),
           { 'accepted-page': this.get('reportCurrentPage') });
@@ -341,20 +347,20 @@ export default Ember.Component.extend({
         this.set('_runningXHRs', runningXHRs);
       }
 
-      Ember.$('.report-viewer').find('.prev-page-button').removeClass('disabled');
+      this.set("isPrevButtonDisabled", false);
       if (this.get('reportCurrentPage') === this.get('reportPagesCount')) {
-        Ember.$('.report-viewer').find('.next-page-button').addClass('disabled');
+        this.set("isNextButtonDisabled", true);
       }
     },
 
     getPrevPage() {
       if (this.get('reportCurrentPage') > 1) {
 
-        let runningXHRs = this.get('_runningXHRs') || [];
+        const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
         this.decrementProperty('reportCurrentPage');
-        let parameters = Object.assign(
+        const parameters = Object.assign(
           {},
           this._getNormalizedParameters(this.get('reportParameters')),
           { 'accepted-page': this.get('reportCurrentPage') - 1 });
@@ -366,9 +372,9 @@ export default Ember.Component.extend({
         this.set('_runningXHRs', runningXHRs);
       }
 
-      Ember.$('.report-viewer').find('.next-page-button').removeClass('disabled');
+      this.set("isNextButtonDisabled", false);
       if (this.get('reportCurrentPage') === 1) {
-        Ember.$('.report-viewer').find('.prev-page-button').addClass('disabled');
+        this.set("isPrevButtonDisabled", true);
       }
     },
 

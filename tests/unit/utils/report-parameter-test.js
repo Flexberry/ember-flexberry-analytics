@@ -5,6 +5,6 @@ module('Unit | Utility | report parameter');
 
 // Replace this with your real tests.
 test('it works', function(assert) {
-  let result = reportParameter();
-  assert.ok(result);
+   let result =reportParameter.create();
+   assert.ok(result);
 });

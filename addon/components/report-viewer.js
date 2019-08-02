@@ -173,13 +173,13 @@ export default Ember.Component.extend({
    * @param {Object} parameters Параметры отчёта.
    */
   _getNormalizedParameters(parameters) {
-    let normalizedParameters = Ember.copy(parameters);
+    const normalizedParameters = Ember.copy(parameters);
 
     Object.keys(normalizedParameters).forEach(key => {
       normalizedParameters[key].set('value', this._tryParseJSON(normalizedParameters[key].get('value')) || normalizedParameters[key].get('value'));
 
       if (normalizedParameters[key].get('value') instanceof Date) {
-        let value = normalizedParameters[key].get('value');
+        const value = normalizedParameters[key].get('value');
         normalizedParameters[key].set('value', moment(value).format('YYYY-MM-DD'));
       }
     });
@@ -214,7 +214,7 @@ export default Ember.Component.extend({
       try {
         this.set('_loading', true);
 
-        let runningXHRs = this.get('_runningXHRs') || [];
+        const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
         runningXHRs.push(this.getReport(this.get('reportPath'), this._getNormalizedParameters(this.get('reportParameters')), reportData => {

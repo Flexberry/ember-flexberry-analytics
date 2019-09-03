@@ -2,40 +2,122 @@ import Ember from 'ember';
 import moment from 'moment';
 import layout from '../templates/components/report-viewer';
 
+/**
+ * Компонент для отображения интерфейса отчета.
+ * @class report-viewer
+ */
 export default Ember.Component.extend({
+  /**
+   * Сервис для работы со всплывающими окнами.
+   * @property notifications
+   * @type Class
+   */
   notifications: Ember.inject.service('notification-messages'),
+  /**
+   * Сервис для работы с файлом конфигурации.
+   * @property config
+   * @type Class
+   */
   config: Ember.inject.service(),
 
   layout,
-
+  /**
+   * Компонент для работы добавленными CSS-классами.
+   * @property classNames
+   * @type String[]
+   * @default ['ui', 'segment', 'report-segment']
+   */
   classNames: ['ui', 'segment', 'report-segment'],
 
+  /**
+   * Ссылка на Api для работы с сервисом отчетов.
+   * @private
+   * @property _reportAPIEndpoint
+   * @type String
+   * @default null
+   */
   _reportAPIEndpoint: null,
 
   /**
    * Флаг, отображающий загрузку компонента.
+   * @private
+   * @property _loading
+   * @type Boolean
+   * @default false
    */
   _loading: false,
 
   /**
    * Массив с запущенными xhr'ми.
+   * @private
+   * @property _runningXHRs
+   * @type Object[]
    */
   _runningXHRs: undefined,
 
+  /**
+   * Наименнование отчета.
+   * @property reportName
+   * @type String
+   */
   reportName: undefined,
+  /**
+   * Параметры отчета.
+   * @property reportParameters
+   * @type report-parametr
+   */
   reportParameters: undefined,
-
-  reportCurrentPage: 0,
-  reportPagesCount: 0,
-
-  isNextButtonDisabled: true,
-  isPrevButtonDisabled: true,
-  // Путь к отчету в pentaho
+  /**
+   * Относительная ссылка на отчет в системе отчетов.
+   * @property reportPath
+   * @typeString
+   */
   reportPath: undefined,
-  
+  /**
+   * Текущая страница отчета.
+   * @property reportCurrentPage
+   * @type Int
+   * @default 0
+   */
+  reportCurrentPage: 0,
+    /**
+   * Количество страниц в отчете.
+   * @property reportPagesCount
+   * @type Int
+   * @default 0
+   */
+  reportPagesCount: 0,
+  /**
+   * Флаг, отображающий недоступность кнопки "Следующая страница отчета".
+   * @property isNextButtonDisabled
+   * @type Boolean
+   * @default true
+   */
+  isNextButtonDisabled: true,
+  /**
+   * Флаг, отображающий недоступность кнопки "Предыдущая страница отчета".
+   * @property isPrevButtonDisabled
+   * @type Boolean
+   * @default true
+   */
+  isPrevButtonDisabled: true,
+  /**
+   * Массив возможных форматов для вывода отчета.
+   * @property pentahoReportFormats
+   * @type String[]
+   */
   pentahoReportFormats:undefined,
-
+  /**
+   * Ширина окна для отображения содержимого отчета.
+   * @property frameWidth
+   * @type Double
+   */
   frameWidth:undefined,
+   /**
+   * Высота окна для отображения содержимого отчета.
+   * @property frameHeight
+   * @type Double
+   */
   frameHeight:undefined,
 
   init() {
@@ -51,17 +133,41 @@ export default Ember.Component.extend({
     });
     
   },
-
+  /**
+   * Метод для получения разметки отчёта из сервиса.
+   * @method getReport
+   * @param {String} path Относительный ссылка на отчёт в системе отчетов.
+   * @param {Object[]} parameters Массив параметров отчета.
+   * @param {Function} onDone Функция обратного вызова на случай успеха.
+   * @param {Function} onFail Функция обратного вызова на случай ошибки.
+   * @returns {Object} Разметка отчета.
+   */
   getReport(path, parameters, onDone, onFail) {
     Object.assign(parameters, { reportPath: path });
     return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}getReport/`, parameters, 'json', onDone, onFail);
   },
-
+  /**
+   * Метод для получения количества страниц из системы отчетов.
+   * @method getReportPagesCount
+   * @param {String} path Относительный ссылка на отчёт в системе отчетов.
+   * @param {Object[]} parameters Массив параметров отчета.
+   * @param {Function} onDone Функция обратного вызова на случай успеха.
+   * @param {Function} onFail Функция обратного вызова на случай ошибки.
+   * @returns {Object} Количество страниц отчета.
+   */
   getReportPagesCount(path, parameters, onDone, onFail) {
     Object.assign(parameters, { reportPath: path });
     return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}getPageCount/`, parameters, '', onDone, onFail);
   },
-
+  /**
+   * Метод для получения файл для экспорта из системы отчетов.
+   * @method getExportReportData
+   * @param {String} path Относительный ссылка на отчёт в системе отчетов.
+   * @param {Object[]} parameters Массив параметров отчета.
+   * @param {Function} onDone Функция обратного вызова на случай успеха.
+   * @param {Function} onFail Функция обратного вызова на случай ошибки.
+   * @returns {Object} Бинарный файл для экспорта.
+   */
   getExportReportData(path, parameters, onDone, onFail) {
     Object.assign(parameters, { reportPath: path });
     return this._sendPostRequest(`${this.get('_reportAPIEndpoint')}export/`, parameters, 'blob', onDone, onFail);
@@ -70,6 +176,7 @@ export default Ember.Component.extend({
   /**
   * Обсервер на число максимального кол-ва страниц в отчете,
   * ибо оно формируется не мгновенно
+  * @method reportPagesCountObservation
   */
   reportPagesCountObservation: Ember.observer('reportPagesCount', function() {
     if (this.get('reportCurrentPage') !== this.get('reportPagesCount')) {
@@ -79,7 +186,8 @@ export default Ember.Component.extend({
 
   /**
    *  Отображает отчёт в поле для отчёта.
-   * @param {String} reportHtml html-разметка отчёта.
+   * @method showReport
+   * @param {String} reportHtml HTML-разметка отчёта.
    */
   showReport(reportHtml) {
     const $contentIframe = this.$('#content');
@@ -91,6 +199,7 @@ export default Ember.Component.extend({
 
   /**
    *  Единая точка входа для отправки POST-запроса.
+   * @method _sendPostRequest
    * @param {String} uri URI для отправки.
    * @param {Object} parameters Тело запроса.
    * @param {String} dataType Тип возвращаемых данных.
@@ -130,6 +239,7 @@ export default Ember.Component.extend({
 
   /**
    *  Загружает файл на компьютер.
+   * @method _downloadFile
    * @param {String} fileContent Контент.
    * @param {String} fileName Имя файла.
    * @param {String} fileType Тип файла.
@@ -169,8 +279,10 @@ export default Ember.Component.extend({
   },
 
   /**
-   *  Возвращает параметры отчёта в нормализованном виде.
+   * Возвращает параметры отчёта в нормализованном виде.
+   * @method _getNormalizedParameters
    * @param {Object} parameters Параметры отчёта.
+   * @returns {Object} Преобразованные значения параметра в JSON объекты.
    */
   _getNormalizedParameters(parameters) {
     const normalizedParameters = Ember.copy(parameters);
@@ -187,6 +299,12 @@ export default Ember.Component.extend({
     return normalizedParameters;
   },
 
+  /**
+   * Преобразует строку в JSON объект.
+   * @method _tryParseJSON
+   * @param {String} string 
+   * @returns {Object} В случае успешного преобразования строки возвращает JSON объект, иначе NULL.
+   */
   _tryParseJSON(string) {
     try {
       return JSON.parse(string);
@@ -196,7 +314,8 @@ export default Ember.Component.extend({
   },
 
   /**
-   * Отменить выполняемые запросы.
+   * Отмена выполняемого запроса.
+   * @method _abortRunningXHRs
    */
   _abortRunningXHRs() {
     const runningXHRs = this.get('_runningXHRs') || [];
@@ -210,6 +329,10 @@ export default Ember.Component.extend({
   },
 
   actions: {
+    /**
+     * Обработчик построения отчета.
+     *@method actions.buildReport
+     */
     buildReport() {
       try {
         this.set('_loading', true);
@@ -242,7 +365,7 @@ export default Ember.Component.extend({
 
     /**
      * Обработчик экшена - экспорт отчета.
-     *
+     * @method actions.exportReport
      * @param {String} exportFormat формат экспортируемого документа.
      */
     exportReport(exportFormat) {
@@ -298,7 +421,11 @@ export default Ember.Component.extend({
         });
       }
     },
-
+    
+    /**
+     * Обработчик экшена - печать отчета.
+     * @method actions.printReport
+     */
     printReport() {
       try {
         this.set('_loading', true);
@@ -328,6 +455,10 @@ export default Ember.Component.extend({
       }
     },
 
+    /**
+     * Обработчик экшена - переход на следующую страницу.
+     * @method actions.getNextPage
+     */
     getNextPage() {
       if (this.get('reportCurrentPage') + 1 <= this.get('reportPagesCount')) {
 
@@ -353,6 +484,10 @@ export default Ember.Component.extend({
       }
     },
 
+    /**
+     * Обработчик экшена - переход на следующую страницу.
+     * @method actions.getPrevPage
+     */
     getPrevPage() {
       if (this.get('reportCurrentPage') > 1) {
 
@@ -378,6 +513,10 @@ export default Ember.Component.extend({
       }
     },
 
+    /**
+     * Обработчик экшена - Прерывание обработки отчета.
+     * @method actions.abortRequest
+     */
     abortRequest() {
       this._abortRunningXHRs();
       this.set('_loading', false);

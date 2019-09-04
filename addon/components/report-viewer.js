@@ -123,7 +123,7 @@ export default Ember.Component.extend({
   init() {
     this._super();
     const config = this.get('config');
-    this.set('_reportAPIEndpoint', config.get('report.reportWebApi') + '/api/Report/');
+    this.set('_reportAPIEndpoint', config.get('report.reportWebApi') + '/reportapi/Report/');
     this.set('pentahoReportFormats',{
       pageableHtml: 'table/html;page-mode=page',
       fullHtml: 'table/html;page-mode=stream',

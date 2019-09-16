@@ -18,6 +18,13 @@ module.exports = function(environment) {
       // when it is created
     }
   };
+  ENV.i18n = {
+    // Should be defined to avoid ember-i18n deprecations.
+    // Locale will be changed then to navigator current locale (in instance initializer).
+    defaultLocale: 'ru',
+    locale: ['ru','en'],
+    locales: ['ru','en']
+  };
 
   if (environment === 'development') {
     // ENV.APP.LOG_RESOLVER = true;

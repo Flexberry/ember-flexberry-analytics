@@ -3,7 +3,7 @@ import ReportParameter from '../utils/report-parameter';
 
 export default Ember.Controller.extend({
     reportName: 'Пример отчета Pentaho',
-
+    locales: ['ru'],
     reportParameters: {},
     reportPath: ':public:Other Project:PentahoSample.prpt',
     doclist : ['Паспорт РФ','Загранпаспорт','Снилс','Водительское удостоверение','Военный билет'],
@@ -56,6 +56,10 @@ export default Ember.Controller.extend({
           const res =favorite.join("&parMultiSelect=");
           
           this.set('reportParameters.documentlist.value',res);
+        },
+
+        printLog(message){
+          console.log(message);
         }
     }
 });

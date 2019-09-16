@@ -8,6 +8,12 @@ import layout from '../templates/components/report-viewer';
  */
 export default Ember.Component.extend({
   /**
+   * Сервис для работы с локализацией переменных.
+   * @property i18n
+   * @type Class
+   */
+  i18n: Ember.inject.service(),
+   /**
    * Сервис для работы со всплывающими окнами.
    * @property notifications
    * @type Class
@@ -119,7 +125,28 @@ export default Ember.Component.extend({
    * @type Double
    */
   frameHeight:undefined,
-
+    /**
+    * Функция, выполняемая перед формированием отчета.
+    * @property beforeReportBuildFunction
+    * @type Function
+    * @default undefined
+    */
+  beforeReportBuildFunction:undefined,
+    /**
+    * Функция, выполняемая после формирования отчета.
+    * @property afterReportBuildFunction
+    * @type Function
+    * @default undefined
+    */
+  afterReportBuildFunction:undefined,
+  /**
+   * Функция, выполняем при ошибке формарирования отчета.
+   * @property onErrorFunction
+   * @type Function
+   * @default undefined
+   */
+  onErrorFunction:undefined,
+  
   init() {
     this._super();
     const config = this.get('config');
@@ -328,6 +355,19 @@ export default Ember.Component.extend({
     }
   },
 
+  /**
+   * Проверка и выполнение функции.
+   * @method _callFunctionIfDefine
+   * @param {Function} func Вызываемая функция.
+   */
+  _callFunctionIfDefine(func){
+    if (func){
+      if ((func instanceof Function)){
+        func();
+      }
+    }
+  },
+
   actions: {
     /**
      * Обработчик построения отчета.
@@ -336,7 +376,7 @@ export default Ember.Component.extend({
     buildReport() {
       try {
         this.set('_loading', true);
-
+        this._callFunctionIfDefine(this.beforeReportBuildFunction);
         const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
@@ -350,17 +390,21 @@ export default Ember.Component.extend({
         }));
 
         this.set('reportCurrentPage', 1);
-
+        
         this.set('_runningXHRs', runningXHRs);
       } catch (e) {
         this.set('_loading', false);
-        Ember.Logger.log('Ошибка построения отчёта.', e);
-
-        this.get('notifications').error('Ошибка построения отчёта. Обратитесь к администратору', {
+        Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-build'), e);
+        
+        this.get('notifications').error(this.get('i18n').t('ember-flexberry-analytics.error-on-report-build-notification'), {
           autoClear: true,
           clearDuration: 7000
         });
+
+        this._callFunctionIfDefine(this.onErrorFunction);
       }
+
+      this._callFunctionIfDefine(this.afterReportBuildFunction);
     },
 
     /**
@@ -409,16 +453,18 @@ export default Ember.Component.extend({
             `${this.get('reportName')} на ${moment().format('YYYY-MM-DD')}.${exportFormat}`,
             fileType);
         }));
-
+        
         this.set('_runningXHRs', runningXHRs);
       } catch (e) {
         this.set('_loading', false);
-        Ember.Logger.log('Ошибка при экспорте отчёта.', e);
-
-        this.get('notifications').error('Ошибка при экспорте отчёта. Обратитесь к администратору', {
+        Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-export'), e);
+        
+        this.get('notifications').error( this.get('i18n').t('ember-flexberry-analytics.error-on-report-export-notification'), {
           autoClear: true,
           clearDuration: 7000
         });
+
+        this._callFunctionIfDefine(this.onErrorFunction);
       }
     },
     
@@ -443,15 +489,16 @@ export default Ember.Component.extend({
         }));
 
         this.set('_runningXHRs', runningXHRs);
-
       } catch (e) {
         this.set('_loading', false);
-        Ember.Logger.log('Ошибка при печати отчёта.', e);
-
-        this.get('notifications').error('Ошибка при печати отчёта. Обратитесь к администратору', {
+        Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-print'), e);
+        
+        this.get('notifications').error(this.get('i18n').t('ember-flexberry-analytics.error-on-report-print-notification'), {
           autoClear: true,
           clearDuration: 7000
         });
+        
+        this._callFunctionIfDefine(this.onErrorFunction);
       }
     },
 
@@ -520,8 +567,8 @@ export default Ember.Component.extend({
     abortRequest() {
       this._abortRunningXHRs();
       this.set('_loading', false);
-
-      this.get('notifications').info('Формирование отчёта отменено', {
+     
+      this.get('notifications').info(this.get('i18n').t('ember-flexberry-analytics.cancel-report-build'), {
         autoClear: true,
         clearDuration: 7000,
         cssClasses: 'ember-cli-notification-info'

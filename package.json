@@ -1,7 +1,7 @@
 {
   "name": "ember-flexberry-analytics",
-  "version": "0.0.0",
-  "description": "The default blueprint for ember-cli addons.",
+  "version": "0.1.0-alpha.1",
+  "description": "Flexberry Analytics EmberJS Addon.",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -11,11 +11,18 @@
     "start": "ember server",
     "test": "ember try:testall"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Flexberry/ember-flexberry-analytics.git"
+  },
   "engines": {
     "node": ">= 0.10.0"
   },
-  "author": "",
+  "author": {
+    "name": "Flexberry Team",
+    "email": "mail@flexberry.net",
+    "url": "https://flexberry.net/"
+  },
   "license": "MIT",
   "devDependencies": {
     "broccoli-asset-rev": "^2.4.2",

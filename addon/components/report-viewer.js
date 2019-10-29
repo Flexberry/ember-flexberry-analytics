@@ -13,11 +13,11 @@ export default Ember.Component.extend({
    * @type Class
    */
   i18n: Ember.inject.service(),
-   /**
-   * Сервис для работы со всплывающими окнами.
-   * @property notifications
-   * @type Class
-   */
+  /**
+  * Сервис для работы со всплывающими окнами.
+  * @property notifications
+  * @type Class
+  */
   notifications: Ember.inject.service('notification-messages'),
   /**
    * Сервис для работы с файлом конфигурации.
@@ -86,12 +86,12 @@ export default Ember.Component.extend({
    * @default 0
    */
   reportCurrentPage: 0,
-    /**
-   * Количество страниц в отчете.
-   * @property reportPagesCount
-   * @type Int
-   * @default 0
-   */
+  /**
+ * Количество страниц в отчете.
+ * @property reportPagesCount
+ * @type Int
+ * @default 0
+ */
   reportPagesCount: 0,
   /**
    * Флаг, отображающий недоступность кнопки "Следующая страница отчета".
@@ -112,53 +112,78 @@ export default Ember.Component.extend({
    * @property pentahoReportFormats
    * @type String[]
    */
-  pentahoReportFormats:undefined,
+  pentahoReportFormats: undefined,
   /**
    * Ширина окна для отображения содержимого отчета.
    * @property frameWidth
    * @type Double
    */
-  frameWidth:undefined,
-   /**
-   * Высота окна для отображения содержимого отчета.
-   * @property frameHeight
-   * @type Double
+  frameWidth: undefined,
+  /**
+  * Высота окна для отображения содержимого отчета.
+  * @property frameHeight
+  * @type Double
+  */
+  frameHeight: undefined,
+
+  /**
+   * Флаг для отображения кнопки "export to pdf"
+   * @property showButtonExportPdf
+   * @type Boolean
+   * @default true
    */
-  frameHeight:undefined,
-    /**
-    * Функция, выполняемая перед формированием отчета.
-    * @property beforeReportBuildFunction
-    * @type Function
-    * @default undefined
-    */
-  beforeReportBuildFunction:undefined,
-    /**
-    * Функция, выполняемая после формирования отчета.
-    * @property afterReportBuildFunction
-    * @type Function
-    * @default undefined
-    */
-  afterReportBuildFunction:undefined,
+  showButtonExportPdf: true,
+
+  /**
+   * Флаг для отображения кнопки "export to xlsx"
+   * @property showButtonExportXlsx
+   * @type Boolean
+   * @default true
+   */
+  showButtonExportXlsx: true,
+
+  /**
+   * Флаг для отображения кнопки "export to csv"
+   * @property showButtonExportCsv
+   * @type Boolean
+   * @default true
+   */
+
+   showButtonExportCsv: true,
+  /**
+  * Функция, выполняемая перед формированием отчета.
+  * @property beforeReportBuildFunction
+  * @type Function
+  * @default undefined
+  */
+  beforeReportBuildFunction: undefined,
+  /**
+  * Функция, выполняемая после формирования отчета.
+  * @property afterReportBuildFunction
+  * @type Function
+  * @default undefined
+  */
+  afterReportBuildFunction: undefined,
   /**
    * Функция, выполняем при ошибке формарирования отчета.
    * @property onErrorFunction
    * @type Function
    * @default undefined
    */
-  onErrorFunction:undefined,
-  
+  onErrorFunction: undefined,
+
   init() {
     this._super();
     const config = this.get('config');
     this.set('_reportAPIEndpoint', config.get('report.reportWebApi'));
-    this.set('pentahoReportFormats',{
+    this.set('pentahoReportFormats', {
       pageableHtml: 'table/html;page-mode=page',
       fullHtml: 'table/html;page-mode=stream',
       pdf: 'pageable/pdf',
       csv: 'table/csv;page-mode=stream',
       xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow',
     });
-    
+
   },
   /**
    * Метод для получения разметки отчёта из сервиса.
@@ -205,9 +230,9 @@ export default Ember.Component.extend({
   * ибо оно формируется не мгновенно
   * @method reportPagesCountObservation
   */
-  reportPagesCountObservation: Ember.observer('reportPagesCount', function() {
+  reportPagesCountObservation: Ember.observer('reportPagesCount', function () {
     if (this.get('reportCurrentPage') !== this.get('reportPagesCount')) {
-     this.set('isNextButtonDisabled', false);
+      this.set('isNextButtonDisabled', false);
     }
   }),
 
@@ -220,8 +245,8 @@ export default Ember.Component.extend({
     const $contentIframe = this.$('#content');
 
     $contentIframe.contents().find('body').html(reportHtml);
-    this.set("frameHeight",`${$contentIframe.contents().find('body').prop('scrollHeight')}px`);
-    this.set("frameWidth",`${$contentIframe.contents().find('body').prop('scrollWidth')}px`);
+    this.set("frameHeight", `${$contentIframe.contents().find('body').prop('scrollHeight')}px`);
+    this.set("frameWidth", `${$contentIframe.contents().find('body').prop('scrollWidth')}px`);
   },
 
   /**
@@ -261,8 +286,8 @@ export default Ember.Component.extend({
       onError(e);
     };
 
-    xhr.send(JSON.stringify(parameters)); 
-  }, 
+    xhr.send(JSON.stringify(parameters));
+  },
 
   /**
    *  Загружает файл на компьютер.
@@ -329,7 +354,7 @@ export default Ember.Component.extend({
   /**
    * Преобразует строку в JSON объект.
    * @method _tryParseJSON
-   * @param {String} string 
+   * @param {String} string
    * @returns {Object} В случае успешного преобразования строки возвращает JSON объект, иначе NULL.
    */
   _tryParseJSON(string) {
@@ -360,9 +385,9 @@ export default Ember.Component.extend({
    * @method _callFunctionIfDefine
    * @param {Function} func Вызываемая функция.
    */
-  _callFunctionIfDefine(func){
-    if (func){
-      if ((func instanceof Function)){
+  _callFunctionIfDefine(func) {
+    if (func) {
+      if ((func instanceof Function)) {
         func();
       }
     }
@@ -390,12 +415,12 @@ export default Ember.Component.extend({
         }));
 
         this.set('reportCurrentPage', 1);
-        
+
         this.set('_runningXHRs', runningXHRs);
       } catch (e) {
         this.set('_loading', false);
         Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-build'), e);
-        
+
         this.get('notifications').error(this.get('i18n').t('ember-flexberry-analytics.error-on-report-build-notification'), {
           autoClear: true,
           clearDuration: 7000
@@ -453,13 +478,13 @@ export default Ember.Component.extend({
             `${this.get('reportName')} на ${moment().format('YYYY-MM-DD')}.${exportFormat}`,
             fileType);
         }));
-        
+
         this.set('_runningXHRs', runningXHRs);
       } catch (e) {
         this.set('_loading', false);
         Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-export'), e);
-        
-        this.get('notifications').error( this.get('i18n').t('ember-flexberry-analytics.error-on-report-export-notification'), {
+
+        this.get('notifications').error(this.get('i18n').t('ember-flexberry-analytics.error-on-report-export-notification'), {
           autoClear: true,
           clearDuration: 7000
         });
@@ -467,7 +492,7 @@ export default Ember.Component.extend({
         this._callFunctionIfDefine(this.onErrorFunction);
       }
     },
-    
+
     /**
      * Обработчик экшена - печать отчета.
      * @method actions.printReport
@@ -492,12 +517,12 @@ export default Ember.Component.extend({
       } catch (e) {
         this.set('_loading', false);
         Ember.Logger.log(this.get('i18n').t('ember-flexberry-analytics.error-on-report-print'), e);
-        
+
         this.get('notifications').error(this.get('i18n').t('ember-flexberry-analytics.error-on-report-print-notification'), {
           autoClear: true,
           clearDuration: 7000
         });
-        
+
         this._callFunctionIfDefine(this.onErrorFunction);
       }
     },
@@ -567,7 +592,7 @@ export default Ember.Component.extend({
     abortRequest() {
       this._abortRunningXHRs();
       this.set('_loading', false);
-     
+
       this.get('notifications').info(this.get('i18n').t('ember-flexberry-analytics.cancel-report-build'), {
         autoClear: true,
         clearDuration: 7000,

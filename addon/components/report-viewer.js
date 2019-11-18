@@ -125,6 +125,31 @@ export default Ember.Component.extend({
   * @type Double
   */
   frameHeight: undefined,
+
+  /**
+   * Флаг для отображения кнопки "export to pdf"
+   * @property showButtonExportPdf
+   * @type Boolean
+   * @default true
+   */
+  showButtonExportPdf: true,
+
+  /**
+   * Флаг для отображения кнопки "export to xlsx"
+   * @property showButtonExportXlsx
+   * @type Boolean
+   * @default true
+   */
+  showButtonExportXlsx: true,
+
+  /**
+   * Флаг для отображения кнопки "export to csv"
+   * @property showButtonExportCsv
+   * @type Boolean
+   * @default true
+   */
+
+   showButtonExportCsv: true,
   /**
   * Функция, выполняемая перед формированием отчета.
   * @property beforeReportBuildFunction

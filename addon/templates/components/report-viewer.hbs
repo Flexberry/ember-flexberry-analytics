@@ -5,25 +5,38 @@
 </div>
 <div class="report-viewer">
   <div class="toolbar">
-    <button id="build-report" class="ui create-button button" {{action "buildReport"}}>{{t "ember-flexberry-analytics.build-report"}}</button>
+    <button id="build-report" class="ui create-button button"
+      {{action "buildReport"}}>{{t "ember-flexberry-analytics.build-report"}}</button>
     <div id="export-report">
-      <button class="ui button icon export-button" title="Выгрузка в pdf" {{action 'exportReport' 'pdf'}}>
+      {{#if showButtonExportPdf}}
+      <button class="ui button icon export-button " title={{t "ember-flexberry-analytics.export-button-caption.pdf"}}
+        {{action 'exportReport' 'pdf'}}>
         <i class="large file pdf outline icon"></i>
-      </button> 
-      <button class="ui button icon export-button" title="Выгрузка в xlsx" {{action 'exportReport' 'xlsx'}}>
+      </button>
+      {{/if}}
+      {{#if showButtonExportXlsx}}
+      <button class="ui button icon export-button " title={{t "ember-flexberry-analytics.export-button-caption.xls"}}
+        {{action 'exportReport' 'xlsx'}}>
         <i class="large file excel outline icon"></i>
       </button>
-      <button class="ui button icon export-button" title="Выгрузка в csv" {{action 'exportReport' 'csv'}}>
+      {{/if}}
+      {{#if showButtonExportCsv}}
+      <button class="ui button icon export-button " title={{t "ember-flexberry-analytics.export-button-caption.csv"}}
+        {{action 'exportReport' 'csv'}}>
         <i class="large file archive outline icon"></i>
       </button>
+      {{/if}}
     </div>
 
-    <button id="print-report" class="ui button" {{action 'printReport'}}>{{t "ember-flexberry-analytics.print-report"}}</button>
+    <button id="print-report" class="ui button"
+      {{action 'printReport'}}>{{t "ember-flexberry-analytics.print-report"}}</button>
 
     <div id="pagging">
-      <button class="ui button prev-page-button {{if isPrevButtonDisabled "disabled"}}" {{action 'getPrevPage'}}></button>
+      <button class="ui button prev-page-button {{if isPrevButtonDisabled "disabled"}}"
+        {{action 'getPrevPage'}}></button>
       {{reportCurrentPage}} {{t "ember-flexberry-analytics.page-number-formatting"}} {{reportPagesCount}}
-      <button class="ui button next-page-button {{if isNextButtonDisabled "disabled"}}" {{action 'getNextPage'}}></button>
+      <button class="ui button next-page-button {{if isNextButtonDisabled "disabled"}}"
+        {{action 'getNextPage'}}></button>
     </div>
   </div>
   <div id="content-block">

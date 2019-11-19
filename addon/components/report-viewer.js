@@ -243,7 +243,7 @@ export default Ember.Component.extend({
   }),
 
   /**
-   * Слушаеть измененией флага на необходимост перестроить очтет.
+   * Слушатель изменений флага на необходимость перестроить отчет.
    * @method reportRefreshObservation
    */
   reportRefreshObservation: Ember.observer('needRefresh', function () {

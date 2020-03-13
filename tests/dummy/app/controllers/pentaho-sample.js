@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import ReportParameter from '../utils/report-parameter';
+import ReportFormat from '../utils/report-output-format';
 
 export default Ember.Controller.extend({
   reportName: 'Пример отчета Pentaho',
@@ -8,10 +9,12 @@ export default Ember.Controller.extend({
   reportPath: ':public:Other Project:PentahoSample.prpt',
   doclist: ['Паспорт РФ', 'Загранпаспорт', 'Снилс', 'Водительское удостоверение', 'Военный билет'],
   needRefreshReport: false,
+  defaultReportFormat:'',
 
   init() {
     this.initReportParameters();
     this.initStartValue();
+    this.set('defaultReportFormat', ReportFormat.FullHtml);
   },
 
   initReportParameters() {

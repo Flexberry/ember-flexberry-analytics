@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import moment from 'moment';
 import layout from '../templates/components/report-viewer';
+import ReportFormat from '../utils/report-output-format';
 
 /**
  * Компонент для отображения интерфейса отчета.
@@ -108,12 +109,6 @@ export default Ember.Component.extend({
    */
   isPrevButtonDisabled: true,
   /**
-   * Массив возможных форматов для вывода отчета.
-   * @property pentahoReportFormats
-   * @type String[]
-   */
-  pentahoReportFormats: undefined,
-  /**
    * Ширина окна для отображения содержимого отчета.
    * @property frameWidth
    * @type Double
@@ -179,18 +174,28 @@ export default Ember.Component.extend({
    */
   needRefresh: false,
 
+  /**
+   * Выходной формат отчета по-умолчанию. В том числе при нажатии кнопки "Сформировать".
+   * @property defaultOutputType
+   * @type String
+   * @default undefined
+   */
+  defaultOutputType: undefined,
+
+  /**
+   * Массив выходных html разметок отчета.
+   * @property validOutputType
+   * @type  ReportFormat[]
+   */
+  validOutputType:[],
+
   init() {
     this._super();
     const config = this.get('config');
     this.set('_reportAPIEndpoint', config.get('report.reportWebApi'));
-    this.set('pentahoReportFormats', {
-      pageableHtml: 'table/html;page-mode=page',
-      fullHtml: 'table/html;page-mode=stream',
-      pdf: 'pageable/pdf',
-      csv: 'table/csv;page-mode=stream',
-      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow',
-    });
-  },
+
+    this.set('validOutputType',[ReportFormat.PageableHtml, ReportFormat.FullHtml]);
+    },
   /**
    * Метод для получения разметки отчёта из сервиса.
    * @method getReport
@@ -253,6 +258,14 @@ export default Ember.Component.extend({
     }
   }),
 
+  reportDefaultOutput: Ember.computed('defaultOutputType',function(){
+    const result = this.get('defaultOutputType');
+    if (Ember.isNone(result) || !this.get('validOutputType').find(format => format == result)){
+      return ReportFormat.PageableHtml;
+    } else {
+      return result;
+    }
+  }),
   /**
    *  Отображает отчёт в поле для отчёта.
    * @method showReport
@@ -422,13 +435,22 @@ export default Ember.Component.extend({
         const runningXHRs = this.get('_runningXHRs') || [];
         this._abortRunningXHRs();
 
-        runningXHRs.push(this.getReport(this.get('reportPath'), this._getNormalizedParameters(this.get('reportParameters')), reportData => {
+        const parameters = Object.assign(this._getNormalizedParameters(this.get('reportParameters')),
+         { 'output-target': this.get('reportDefaultOutput')});
+
+        runningXHRs.push(this.getReport(this.get('reportPath'), parameters, reportData => {
           this.set('_loading', false);
           this.showReport(reportData);
         }));
 
-        runningXHRs.push(this.getReportPagesCount(this.get('reportPath'), this._getNormalizedParameters(this.get('reportParameters')), data => {
-          this.set('reportPagesCount', parseInt(data));
+        let pageCount = this.get('reportPagesCount');
+
+        runningXHRs.push(this.getReportPagesCount(this.get('reportPath'), parameters, data => {
+          let pageCount =  parseInt(data);
+          if (pageCount < 0){
+            pageCount = 1;
+          }
+          this.set('reportPagesCount', pageCount);
         }));
 
         this.set('reportCurrentPage', 1);
@@ -462,15 +484,15 @@ export default Ember.Component.extend({
         switch (exportFormat) {
           case 'pdf':
             fileType = 'application/pdf';
-            pentahoFormat = this.get('pentahoReportFormats.pdf');
+            pentahoFormat = ReportFormat.PDF;
             break;
           case 'xlsx':
             fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            pentahoFormat = this.get('pentahoReportFormats.xlsx');
+            pentahoFormat =ReportFormat.Xlsx;
             break;
           case 'csv':
             fileType = 'text/csv';
-            pentahoFormat = this.get('pentahoReportFormats.csv');
+            pentahoFormat = ReportFormat.CSV;
             break;
         }
 

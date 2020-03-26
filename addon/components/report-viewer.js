@@ -144,7 +144,7 @@ export default Ember.Component.extend({
    * @default true
    */
 
-   showButtonExportCsv: true,
+  showButtonExportCsv: true,
   /**
   * Функция, выполняемая перед формированием отчета.
   * @property beforeReportBuildFunction
@@ -187,15 +187,15 @@ export default Ember.Component.extend({
    * @property validOutputType
    * @type  ReportFormat[]
    */
-  validOutputType:[],
+  validOutputType: [],
 
   init() {
     this._super();
     const config = this.get('config');
     this.set('_reportAPIEndpoint', config.get('report.reportWebApi'));
 
-    this.set('validOutputType',[ReportFormat.PageableHtml, ReportFormat.FullHtml]);
-    },
+    this.set('validOutputType', [ReportFormat.PageableHtml, ReportFormat.FullHtml]);
+  },
   /**
    * Метод для получения разметки отчёта из сервиса.
    * @method getReport
@@ -258,9 +258,9 @@ export default Ember.Component.extend({
     }
   }),
 
-  reportDefaultOutput: Ember.computed('defaultOutputType',function(){
+  reportDefaultOutput: Ember.computed('defaultOutputType', function () {
     const result = this.get('defaultOutputType');
-    if (Ember.isNone(result) || !this.get('validOutputType').find(format => format == result)){
+    if (Ember.isNone(result) || !this.get('validOutputType').find(format => format === result)) {
       return ReportFormat.PageableHtml;
     } else {
       return result;
@@ -436,7 +436,7 @@ export default Ember.Component.extend({
         this._abortRunningXHRs();
 
         const parameters = Object.assign(this._getNormalizedParameters(this.get('reportParameters')),
-         { 'output-target': this.get('reportDefaultOutput')});
+          { 'output-target': this.get('reportDefaultOutput') });
 
         runningXHRs.push(this.getReport(this.get('reportPath'), parameters, reportData => {
           this.set('_loading', false);
@@ -446,8 +446,8 @@ export default Ember.Component.extend({
         let pageCount = this.get('reportPagesCount');
 
         runningXHRs.push(this.getReportPagesCount(this.get('reportPath'), parameters, data => {
-          let pageCount =  parseInt(data);
-          if (pageCount < 0){
+          let pageCount = parseInt(data);
+          if (pageCount < 0) {
             pageCount = 1;
           }
           this.set('reportPagesCount', pageCount);
@@ -488,7 +488,7 @@ export default Ember.Component.extend({
             break;
           case 'xlsx':
             fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            pentahoFormat =ReportFormat.Xlsx;
+            pentahoFormat = ReportFormat.Xlsx;
             break;
           case 'csv':
             fileType = 'text/csv';

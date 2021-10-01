@@ -5,7 +5,7 @@
 </div>
 <div class="report-viewer">
   <div class="toolbar">
-    <button id="build-report" class="ui create-button button"
+    <button id="build-report" class={{concat "ui create-button button" (if isBuildReportButtonDisabled " disabled" "")}}
       {{action "buildReport"}}>{{t "ember-flexberry-analytics.build-report"}}</button>
     <div id="export-report">
       {{#if showButtonExportPdf}}

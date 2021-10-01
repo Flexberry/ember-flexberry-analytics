@@ -145,6 +145,14 @@ export default Ember.Component.extend({
    */
 
   showButtonExportCsv: true,
+
+  /**
+   * Флаг, блокирующий кнопку "Сформировать".
+   * @property isBuildReportButtonDisabled
+   * @type Boolean
+   */
+  isBuildReportButtonDisabled: null,
+
   /**
   * Функция, выполняемая перед формированием отчета.
   * @property beforeReportBuildFunction

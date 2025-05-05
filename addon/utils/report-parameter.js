@@ -1,10 +1,10 @@
-import Ember from 'ember';
+import EmberObject from '@ember/object';
 
 /**
  * Класс для работы с параметрами отчета.
  * @class report-parametr
  */
-export default Ember.Object.extend({
+export default EmberObject.extend({
   /**
    * Имя параметра (соответствует названию параметра в отчёте).
    * @property paramName
@@ -24,5 +24,5 @@ export default Ember.Object.extend({
    * @property value
    * @type String
    */
-  value: null
+  value: null,
 });

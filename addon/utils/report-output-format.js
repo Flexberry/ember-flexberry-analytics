@@ -5,5 +5,5 @@ export default new Enumeration({
   FullHtml: 'table/html;page-mode=stream',
   PDF: 'pageable/pdf',
   CSV: 'table/csv;page-mode=stream',
-  Xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow'
+  Xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;page-mode=flow',
 });

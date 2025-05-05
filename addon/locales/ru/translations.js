@@ -15,7 +15,7 @@ export default {
     'export-button-caption': {
       'pdf': 'Экспорт в PDF',
       'xls': 'Экспорт в Xlsx',
-      'csv': 'Экспорт в CSV'
-    }
-  }
+      'csv': 'Экспорт в CSV',
+    },
+  },
 };

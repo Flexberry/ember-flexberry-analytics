@@ -1,17 +1,24 @@
-import Ember from 'ember';
+import $ from 'jquery';
+import Controller from '@ember/controller';
 import ReportParameter from '../utils/report-parameter';
 import ReportFormat from '../utils/report-output-format';
 
-export default Ember.Controller.extend({
+export default Controller.extend({
   reportName: 'Пример отчета Pentaho',
-  locales: ['ru'],
-  reportParameters: {},
+  locales: undefined,
+  reportParameters: undefined,
   reportPath: ':public:Other Project:PentahoSample.prpt',
-  doclist: ['Паспорт РФ', 'Загранпаспорт', 'Снилс', 'Водительское удостоверение', 'Военный билет'],
+  doclist: undefined,
   needRefreshReport: false,
   defaultReportFormat:'',
 
   init() {
+    this._super(...arguments);
+
+    this.locales = this.locales || ['ru'];
+    this.reportParameters = this.reportParameters || {};
+    this.doclist = this.doclist || ['Паспорт РФ', 'Загранпаспорт', 'Снилс', 'Водительское удостоверение', 'Военный билет'];
+
     this.initReportParameters();
     this.initStartValue();
     this.set('defaultReportFormat', ReportFormat.FullHtml);
@@ -19,19 +26,19 @@ export default Ember.Controller.extend({
 
   initReportParameters() {
     this.set('reportParameters.Birthday', ReportParameter.create({
-      paramName: 'parDate', paramLabel: "День Рождения"
+      paramName: 'parDate', paramLabel: "День Рождения",
     }));
     this.set('reportParameters.city', ReportParameter.create({
-      paramName: 'parDropDown', paramLabel: "Город"
+      paramName: 'parDropDown', paramLabel: "Город",
     }));
     this.set('reportParameters.gender', ReportParameter.create({
-      paramName: 'parRadioButton', paramLabel: "Пол"
+      paramName: 'parRadioButton', paramLabel: "Пол",
     }));
     this.set('reportParameters.textlogin', ReportParameter.create({
-      paramName: 'parText', paramLabel: "Вместо логина"
+      paramName: 'parText', paramLabel: "Вместо логина",
     }));
     this.set('reportParameters.documentlist', ReportParameter.create({
-      paramName: 'parMultiSelect', paramLabel: "Список документов"
+      paramName: 'parMultiSelect', paramLabel: "Список документов",
     }));
   },
 
@@ -45,10 +52,10 @@ export default Ember.Controller.extend({
 
   actions: {
     selectGender() {
-      this.set('reportParameters.gender.value', this.get('genderresult'));
+      this.set('reportParameters.gender.value', this.genderresult);
     },
     selectCity() {
-      this.set('reportParameters.city.value', this.get('selectedCity'));
+      this.set('reportParameters.city.value', this.selectedCity);
     },
     selectdocs() {
       const favorite = [];
@@ -64,6 +71,6 @@ export default Ember.Controller.extend({
 
     printLog(message) {
       console.log(message);
-    }
-  }
+    },
+  },
 });

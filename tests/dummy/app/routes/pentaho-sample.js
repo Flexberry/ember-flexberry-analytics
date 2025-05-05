@@ -1,12 +1,13 @@
-import Ember from 'ember';
+import { schedule } from '@ember/runloop';
+import Route from '@ember/routing/route';
 
-export default Ember.Route.extend({
+export default Route.extend({
   actions: {
     didTransition: function () {
-      Ember.run.schedule('afterRender', () => {
-        this.get('controller').set('needRefreshReport', true);
+      schedule('afterRender', () => {
+        this.controller.set('needRefreshReport', true);
       });
       return true;
-    }
-  }
+    },
+  },
 });

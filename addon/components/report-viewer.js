@@ -375,14 +375,14 @@ export default Ember.Component.extend({
    * @returns {Object} Преобразованные значения параметра в JSON объекты.
    */
   _getNormalizedParameters(parameters) {
-    const normalizedParameters = Ember.copy(parameters);
+    const normalizedParameters = structuredClone(parameters);
 
     Object.keys(normalizedParameters).forEach(key => {
-      normalizedParameters[key].set('value', this._tryParseJSON(normalizedParameters[key].get('value')) || normalizedParameters[key].get('value'));
+      normalizedParameters[key].value = this._tryParseJSON(normalizedParameters[key].value) || normalizedParameters[key].value;
 
-      if (normalizedParameters[key].get('value') instanceof Date) {
-        const value = normalizedParameters[key].get('value');
-        normalizedParameters[key].set('value', moment(value).format('YYYY-MM-DD'));
+      if (normalizedParameters[key].value instanceof Date) {
+        const value = normalizedParameters[key].value;
+        normalizedParameters[key].value = moment(value).format('YYYY-MM-DD');
       }
     });
 
